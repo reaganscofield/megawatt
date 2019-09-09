@@ -1,4 +1,5 @@
 import json
+import requests
 from rest_framework import status
 import requests as RequestData
 from rest_framework import viewsets, generics
@@ -7,42 +8,43 @@ from django.db.models import Q
 from rest_framework.views import APIView
 from .models import Plant, DataPoint
 from .serializers import *
-from .hardcodeddata import hardcoded_data
 from background_task import background
 
 
 """
     REST API to pull data from the monitoring service in a programmatic way.
     Periodic task to pull data from the monitoring service every day.
-    Instead of Pulling Data from monitoring service I am getting data from 
-    hardcodeddata module and save it to PostgreSQL Database in every 24 hours 
+    pull data in every 24 hours and save it to postgesql database
 """
 @background(schedule=60*60*24)  # function to be fired in every 24 hours 
-def pull_from_monitoring_service():
-    monitoring_data = hardcoded_data
-    convert_to_valid_data = []
+def pull_from_monitoring_service(motoringEndPoint):
+    try:
+        request = requests.get(url=motoringEndPoint)
+        response = request.json()
+        if request.status_code ==  200 and len(response) > 0:
+            convert_to_valid_data = []
+            for data in response:
+                _data = {
+                    "datetime": data['datetime'],
+                    "expected": json.dumps(data['expected']),
+                    "observed": json.dumps(data['observed'])
+                }
+                convert_to_valid_data.append(_data)
 
-    for data in monitoring_data:
-        _data = {
-            "datetime": data['datetime'],
-            "expected": json.dumps(data['expected']),
-            "observed": json.dumps(data['observed'])
-        }
-        convert_to_valid_data.append(_data)
-
-    for create in convert_to_valid_data:
-        serializer = DataPointSerializer(data=create)
-        if serializer.is_valid(raise_exception=True):
-            obj = DataPoint.objects.create(
-                datetime = serializer['datetime'].value,
-                expected = serializer['expected'].value,
-                observed = serializer['observed'].value
-            )
-            obj.save()
-            print("Success Created: {}".format(obj.id))
-        else:
-            print('error ', serializer.errors)
-
+            for create in convert_to_valid_data:
+                serializer = DataPointSerializer(data=create)
+                if serializer.is_valid(raise_exception=True):
+                    obj = DataPoint.objects.create(
+                        datetime = serializer['datetime'].value,
+                        expected = serializer['expected'].value,
+                        observed = serializer['observed'].value
+                    )
+                    obj.save()
+                    print("Success Created: {}".format(obj.id))
+                else:
+                    print('error ', serializer.errors)
+    except ConnectionError as Error:
+        return "error: {}".format(Error)
 
 """
     REST API for managing solar panel plants (CRUD)
