@@ -28,8 +28,10 @@ run command
     $ git clone https://github.com/reaganscofield/megawatt.git
 ```
 
+Navigate to project directory
+
 ```
-    cd megawatt
+    $ cd megawatt
 ```
 
 Build<br />
