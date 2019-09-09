@@ -28,6 +28,10 @@ run command
     $ git clone https://github.com/reaganscofield/megawatt.git
 ```
 
+```
+    cd megawatt
+```
+
 Build<br />
 run command:
 ```
