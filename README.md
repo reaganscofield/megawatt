@@ -123,12 +123,65 @@ run command
 
 Now Run Migrations Commands  <br />
 
-Makemigrartions <br />
+Open new terminal in your root directory<br />
 run command
 
 ```
     $ make migrations
 ```
+
+if migrations run success skip this instructions inside #### tags if migrations did not run success please there is 
+a problem with Background_Tasks third party package follow the instructions inside #### tags and re-run "make migrations"
+then follow the rest of instructions outside of #### tags 
+
+
+###########################################################################################################
+1. Open your project in your IDE
+2. go inside megawatt/settings.py
+3. on line 31 INSTALLED_APPS please comment out back 'background_task' 
+```
+INSTALLED_APPS = [
+    'background_task',      #"comment out this line"
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'backend_app',
+    'corsheaders',
+]
+```
+
+4. inside the same directory go to megawatt/urls.py
+5. comment out line 18 comment out 'views.pull_from_monitoring_service()'
+```
+    views.pull_from_monitoring_service()  #"comment out this line"
+```
+
+6. go inside backend_app/views.py
+7. comment out line 11 
+```
+    from background_task import background   #"comment out this line"
+```
+
+8. inside the same file go to line 20 "@background(schedule=60*60*24)"
+9. comment out line 20
+```
+    @background(schedule=60*60*24)  #"comment out this line"
+``` 
+
+Now Re-Run Migrations 
+run command <br />
+
+```
+    $ make migrations
+```
+if migrations run success please remove all the comment you have added and follow the rest of instructions outside of ### tags
+###########################################################################################################
+
+
 
 Migrate  <br />
 run command
