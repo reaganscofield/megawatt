@@ -1,6 +1,7 @@
 # Megawatt Solution 
 ===============
 
+1. User Interface Screenshot
 
 <p align="center">
   <img src="Screenshot.png" width="350" alt="screenshot"> 
@@ -10,31 +11,40 @@
   <img src="Screenshot0.png" width="350" alt="screenshort0">
 </p>
 
+2. Requirements
 
 Requirements <br />
     : Linux Distro or Darwin  <br />
     : Note (for windows users your will need to review Makefile and change sudo priviledge) <br />
     : Docker <br />
 
-please note that every commmand you run will promp you to provide your password <br />
+Please note that every commmand you run will promp you to provide your password <br />
+
+3. Clone Repo and Build Install Dependencies
+
+Clone repository <br />
+run command
+```
+    $ git clone https://github.com/reaganscofield/megawatt.git
+```
 
 Build<br />
 run command:
-
 ```
     $ make build
 ```
 
 Run <br />
 run command
-
 ```
     $ make run
 ```
 
-your can open your browser to access PGADMIN INTERFACE <br />
+4. Database Set up
 
-URL :  127.0.0.1:5558 <br />
+Your can open your browser to access PGADMIN INTERFACE <br />
+
+URL :  http://127.0.0.1:5558  <br />
 
 now you can login to your PGADMIN INTERFACE with  <br />
 
