@@ -1,0 +1,71 @@
+version: '3'
+
+services:
+
+    #PULLING IMAGE & CONFIG BACK-END
+    web:
+        build: .
+        command: python manage.py runserver 0.0.0.0:4700
+        volumes:
+            - .:/code
+        ports:
+            - "4700:4700"
+        depends_on:
+            - postgres
+            - monitoring_service_api
+ 
+
+    #PULLING IMAGE & CONFIG MONITORING SERVICE
+    monitoring_service_api:
+        image: palacios3mw/monitor
+        hostname: 127.0.0.1
+        ports:
+            - "5001:5000"
+
+    #PULLING IMAGE & CONFIG FRONT-END
+    frontend_app:
+        build: ./frontend_app
+        volumes:
+            - ./frontend_app:/app
+            - /app/node_modules
+        ports:
+            - "6099:6075"
+            - "6098:6076"
+        environment:
+            - NODE_ENV=development
+        depends_on:
+            - web
+        command: npm start
+    
+    #PULLING IMAGE & CONFIG POSTGRES DATABASE
+    postgres:
+        image: postgres
+        hostname: postgres
+        ports:
+            - "6545:5432"
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: TEST_SM
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+        restart: unless-stopped
+
+    pgadmin:
+        image: dpage/pgadmin4
+        depends_on:
+            - postgres
+        ports:
+            - "5558:80"
+        environment:
+            PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+            PGADMIN_DEFAULT_PASSWORD: admin
+        restart: unless-stopped
+   
+volumes:
+  postgres-data:
+
+
+
+
+
