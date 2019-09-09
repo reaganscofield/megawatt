@@ -110,6 +110,17 @@ Now Create Database <br />
 name : megawatt <br />
 
 
+Stop your docker images and run it again <br />
+run command
+
+```
+    $ ctrl + c
+```
+
+```
+    $ make run
+```
+
 Now Run Migrations Commands  <br />
 
 Makemigrartions <br />
@@ -124,13 +135,6 @@ run command
 
 ```
     $ make migrate
-```
-
-Stop your docker images <br />
-run command
-
-```
-    $ ctrl + c
 ```
 
 Run Your Application <br />
