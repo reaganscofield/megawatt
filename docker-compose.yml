@@ -13,6 +13,27 @@ services:
         depends_on:
             - postgres
             - monitoring_service_api
+            - redis
+    
+    # REDIS AND CELERY CONFIG for Periodics Tasks
+    redis:
+        image: "redis:alpine"
+    celery:
+        build: .
+        command: celery -A megawatt worker -l info
+        volumes:
+            - .:/code
+        depends_on:
+            - postgres
+            - redis
+    celery-beat:
+        build: .
+        command: celery -A megawatt beat -l info
+        volumes:
+            - .:/code
+        depends_on:
+            - postgres
+            - redis
  
 
     #PULLING IMAGE & CONFIG MONITORING SERVICE
@@ -42,7 +63,7 @@ services:
         image: postgres
         hostname: postgres
         ports:
-            - "6545:5432"
+            - "6546:5432"
         environment:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres

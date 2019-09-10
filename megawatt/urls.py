@@ -15,5 +15,5 @@ urlpatterns = [
 ]
 
 # periodic function to be fired in every 24 hours 
-uri = 'http://monitoring_service_api:5000/?plant-id=2&from=2019-01-01&to=2019-02-01'
-views.pull_from_monitoring_service(uri)
+# uri = 'http://monitoring_service_api:5000/?plant-id=2&from=2019-01-01&to=2019-02-01'
+# views.pull_from_monitoring_service(uri)

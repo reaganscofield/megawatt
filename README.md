@@ -55,6 +55,7 @@ and add the below code in your .env file <br />
     DB_USER=postgres
     DB_NAME=megawatt
     DB_ENGINE=django.db.backends.postgresql_psycopg2
+    MONITORING_API_ENDPOINT=http://monitoring_service_api:5000/?plant-id=2&from=2019-01-01&to=2019-02-01
 
 ```
 
@@ -130,59 +131,6 @@ run command
     $ make migrations
 ```
 
-if migrations run success skip this instructions inside #### tags if migrations did not run success please there is 
-a problem with Background_Tasks third party package follow the instructions inside #### tags and re-run "make migrations"
-then follow the rest of instructions outside of #### tags 
-
-
-###########################################################################################################
-1. Open your project in your IDE
-2. go inside megawatt/settings.py
-3. on line 31 INSTALLED_APPS please comment out back 'background_task' 
-```
-INSTALLED_APPS = [
-    'background_task',      #"comment out this line"
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework',
-    'backend_app',
-    'corsheaders',
-]
-```
-
-4. inside the same directory go to megawatt/urls.py
-5. comment out line 18 comment out 'views.pull_from_monitoring_service()'
-```
-    views.pull_from_monitoring_service()  #"comment out this line"
-```
-
-6. go inside backend_app/views.py
-7. comment out line 11 
-```
-    from background_task import background   #"comment out this line"
-```
-
-8. inside the same file go to line 20 "@background(schedule=60*60*24)"
-9. comment out line 20
-```
-    @background(schedule=60*60*24)  #"comment out this line"
-``` 
-
-Now Re-Run Migrations 
-run command <br />
-
-```
-    $ make migrations
-```
-if migrations run success please remove all the comment you have added and follow the rest of instructions outside of ### tags
-###########################################################################################################
-
-
-
 Migrate  <br />
 run command
 
@@ -197,49 +145,19 @@ run command
     $ make run 
 ```
 
-to generate some data to test with you might need to change periodic function decorate  
-parameter from "60*60*24" to "60*2" and then run the bellow periodic command and wait for 2 minutes
-after to minutes function will be called and it will auto pull data from hardcoded module and save
-to PostgreSQL database <br />
 
-inside  "backend_app/views.py" line 20
+inside  "megawatt/settings.py" line 106 change "crontab('*/5 * * * *')" argument  to below: <br />
+every day at 8am:      0 8 * * *        <br />
+every five minutes:    */5 * * * *      <br />
+every 2 minutes:       */2 * * * *      <br />  
 
 ```
-@background(schedule=60*60*24)  # change schedule value to two minnutes 60*2
-def pull_from_monitoring_service():
-    monitoring_data = hardcoded_data
-    convert_to_valid_data = []
-
-    for data in monitoring_data:
-        _data = {
-            "datetime": data['datetime'],
-            "expected": json.dumps(data['expected']),
-            "observed": json.dumps(data['observed'])
+    CELERY_BEAT_SCHEDULE = {
+        'pull_from_monitoring_service': {
+            'task': 'backend_app.views.pull_from_monitoring_service',    
+            'schedule': crontab('0 8 * * *')   # change argument 
         }
-        convert_to_valid_data.append(_data)
-
-    for create in convert_to_valid_data:
-        serializer = DataPointSerializer(data=create)
-        if serializer.is_valid(raise_exception=True):
-            obj = DataPoint.objects.create(
-                datetime = serializer['datetime'].value,
-                expected = serializer['expected'].value,
-                observed = serializer['observed'].value
-            )
-            obj.save()
-            print("Success Created: {}".format(obj.id))
-        else:
-            print('error ', serializer.errors)
-```
-
-For Periodic Task <br />
-
-you need to run another command which will run periodic task <br />
-in every 24 hours, in the same terminal open new terminal tab <br />
-and run this command. <br />
-
-```
-    $ make task
+    }
 ```
 
 Your Back-End Service is EXPOSE on 127.0.0.1:4700 <br />

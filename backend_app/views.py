@@ -1,5 +1,4 @@
 import json
-import requests
 from rest_framework import status
 import requests as RequestData
 from rest_framework import viewsets, generics
@@ -8,7 +7,8 @@ from django.db.models import Q
 from rest_framework.views import APIView
 from .models import Plant, DataPoint
 from .serializers import *
-from background_task import background
+from celery import shared_task
+from django.conf import settings
 
 
 """
@@ -16,10 +16,11 @@ from background_task import background
     Periodic task to pull data from the monitoring service every day.
     pull data in every 24 hours and save it to postgesql database
 """
-@background(schedule=60*60*24)  # function to be fired in every 24 hours 
-def pull_from_monitoring_service(motoringEndPoint):
+@shared_task # function to be fired in every 24 hours 
+def pull_from_monitoring_service():
     try:
-        request = requests.get(url=motoringEndPoint)
+        API = settings.MONITORING_API_ENDPOINT
+        request = RequestData.get(url=API)
         response = request.json()
         if request.status_code ==  200 and len(response) > 0:
             convert_to_valid_data = []
@@ -40,11 +41,12 @@ def pull_from_monitoring_service(motoringEndPoint):
                         observed = serializer['observed'].value
                     )
                     obj.save()
-                    print("Success Created: {}".format(obj.id))
+                    print("Success Pulled:{} | Success Created: {}".format(obj.datetime, obj.id))
                 else:
                     print('error ', serializer.errors)
     except ConnectionError as Error:
         return "error: {}".format(Error)
+
 
 """
     REST API for managing solar panel plants (CRUD)
@@ -53,7 +55,6 @@ class ManagingPlant(viewsets.ModelViewSet):
     queryset = Plant.objects.all()
     serializer_class = PlantSerializer
     
-
 """
     REST API to generate monitoring data reports
 """

@@ -11,4 +11,6 @@ requests==2.22.0
 jsonfield==2.0.2
 django-background-tasks==1.2.0
 django-postgres-extensions==0.9.3
-Faker==2.0.1
+celery==4.3.0
+redis==3.3.8
+
