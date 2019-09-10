@@ -145,9 +145,10 @@ run command
     $ make run 
 ```
 
-Note: I have set Periodics Tasks to pull data from monitoring service every day at midnight but you can change the argument in order to get some data to test with, follow the below instructions.  <br />
+Note: I have set Periodics Tasks to pull data from monitoring service every day at midnight but you can change the argument in order to get some data to test with, follow the below instructions. when you finish making change you might need to stop your project and run it again to apply change you have made.  <br />
 
-Inside  "megawatt/settings.py" line 106 change "crontab('*/5 * * * *')" argument  to below: <br />
+Inside "megawatt/settings.py" line 106 change "crontab('*/5 * * * *')" argument  to below: <br />
+
 every day at midnight:  minute=0, hour=0  <br />
 every five minutes:     */5 * * * *       <br />
 every 2 minutes:       */2 * * * *        <br />
@@ -155,7 +156,7 @@ every 2 minutes:       */2 * * * *        <br />
 ```
     CELERY_BEAT_SCHEDULE = {
         'pull_from_monitoring_service': {
-            'task': 'backend_app.views.pull_from_monitoring_service',    
+            'task': 'backend_app.views.pull_from_monitoring_service',
             'schedule': crontab(minute=0, hour=0)
         }
     }
