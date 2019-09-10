@@ -87,10 +87,6 @@ DATABASES = {
 }
 
 
-
-
-
-
 # Celery Setup
 CELERY_BROKER_URL = 'redis://redis:6379'
 CELERY_RESULT_BACKEND = 'redis://redis:6379'
@@ -98,18 +94,16 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
-
-# every day at 8am:  0 8 * * *   
-# every five minutes: */5 * * * *  
+# every day at midnight:  minute=0, hour=0  
+# every five minutes: */5 * * * * 
 # every 2 minutes: */2 * * * * 
 
 CELERY_BEAT_SCHEDULE = {
     'pull_from_monitoring_service': {
         'task': 'backend_app.views.pull_from_monitoring_service',    
-        'schedule': crontab('*/5 * * * *')
+        'schedule': crontab(minute=0, hour=0)
     }
 }
-
 
 
 # Password validation

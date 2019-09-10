@@ -145,22 +145,23 @@ run command
     $ make run 
 ```
 
+Note: I have set Periodics Tasks to pull data from monitoring service every day at midnight but you can change the argument in order to get some data to test with, follow the below instructions.  <br />
 
-inside  "megawatt/settings.py" line 106 change "crontab('*/5 * * * *')" argument  to below: <br />
-every day at 8am:      0 8 * * *        <br />
-every five minutes:    */5 * * * *      <br />
-every 2 minutes:       */2 * * * *      <br />  
+Inside  "megawatt/settings.py" line 106 change "crontab('*/5 * * * *')" argument  to below: <br />
+every day at midnight:  minute=0, hour=0  <br />
+every five minutes:     */5 * * * *       <br />
+every 2 minutes:       */2 * * * *        <br />
 
 ```
     CELERY_BEAT_SCHEDULE = {
         'pull_from_monitoring_service': {
             'task': 'backend_app.views.pull_from_monitoring_service',    
-            'schedule': crontab('0 8 * * *')   # change argument 
+            'schedule': crontab(minute=0, hour=0)
         }
     }
 ```
 
-Your Back-End Service is EXPOSE on 127.0.0.1:4700 <br />
-Your Front-End Service is EXPOSE on 127.0.0.1:6099 <br />
-Your Database Service is EXPOSE on 127.0.0.1:5558 <br />
-Your Monitoring Service is EXPOSE on 127.0.0.1:5001 <br />
+Your Back-End Service is EXPOSE on    127.0.0.1:4700 <br />
+Your Front-End Service is EXPOSE on   127.0.0.1:6099 <br />
+Your Database Service is EXPOSE on    127.0.0.1:5558 <br />
+Your Monitoring Service is EXPOSE on  127.0.0.1:5001 <br />
